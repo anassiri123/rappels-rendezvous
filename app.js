@@ -67,13 +67,9 @@ async function idbDel(key) {
 }
 
 // ===== NOTIFICATIONS =====
-enableNotif.onclick = async () => {
-  if (!("Notification" in window)) {
-    alert("Notifications non supportées sur ce navigateur.");
-    return;
-  }
-  const perm = await Notification.requestPermission();
-  alert(perm === "granted" ? "Notifications activées ✅" : "Notifications refusées ❌");
+// ===== NOTIFICATIONS (TEST CLIC) =====
+enableNotif.onclick = () => {
+  alert("CLIC DÉTECTÉ ✅");
 };
 
 // ===== AUDIO RECORD =====
