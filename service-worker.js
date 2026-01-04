@@ -1,32 +1,38 @@
-self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
+// 🔥 Firebase Cloud Messaging - Service Worker
 
-// Quand l'utilisateur clique la notification
-self.addEventListener("notificationclick", (event) => {
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
+
+// ⚠️ Configuration Firebase (la tienne)
+firebase.initializeApp({
+  apiKey: "AIzaSyBWCblzEU4XjE_HLF5pXHYvM-8RjVEJJQQ",
+  authDomain: "rappels-rendezvous.firebaseapp.com",
+  projectId: "rappels-rendezvous",
+  storageBucket: "rappels-rendezvous.appspot.com",
+  messagingSenderId: "1022749873102",
+  appId: "1:1022749873102:web:e0d47471a9bb49a5f2519f"
+});
+
+// 📩 Initialiser FCM
+const messaging = firebase.messaging();
+
+// 📲 Notification reçue quand l’app est FERMÉE
+messaging.onBackgroundMessage(function(payload) {
+  console.log("Notification reçue (background): ", payload);
+
+  const title = payload.notification.title || "⏰ Rappel";
+  const options = {
+    body: payload.notification.body || "",
+    icon: "/icon-192.png",
+  };
+
+  self.registration.showNotification(title, options);
+});
+
+// 👆 Clic sur notification
+self.addEventListener("notificationclick", function(event) {
   event.notification.close();
-
-  const alarmId = event.notification?.data?.alarmId;
-
-  event.waitUntil((async () => {
-    const allClients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-
-    // Si une fenêtre est déjà ouverte => focus + message
-    for (const client of allClients) {
-      if ("focus" in client) {
-        await client.focus();
-        client.postMessage({ type: "OPEN_ALARM", alarmId });
-        return;
-      }
-    }
-
-    // Sinon on ouvre l'app
-    const newClient = await self.clients.openWindow("./");
-    // On attend un peu puis on envoie le message
-    setTimeout(async () => {
-      const clientsAfter = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-      for (const client of clientsAfter) {
-        client.postMessage({ type: "OPEN_ALARM", alarmId });
-      }
-    }, 800);
-  })());
+  event.waitUntil(
+    clients.openWindow("/")
+  );
 });
