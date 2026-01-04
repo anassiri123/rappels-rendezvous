@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rappels Rendez-vous</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h2>📅 Mes rendez-vous</h2>
+
+  <form id="appointmentForm">
+    <input type="date" id="date" required />
+    <input type="time" id="time" required />
+
+    <textarea id="text" placeholder="Texte du rappel" required></textarea>
+
+    <button type="button" id="recordBtn">🎙️ Enregistrer l’audio</button>
+    <p id="recordStatus"></p>
+
+    <button type="submit">➕ Ajouter</button>
+  </form>
+
+  <ul id="list"></ul>
+
+  <button id="enableNotif">🔔 Activer les notifications</button>
+
+  <script src="app.js"></script>
+</body>
+</html>
