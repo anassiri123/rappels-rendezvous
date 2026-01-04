@@ -1,8 +1,7 @@
 {
   "name": "Rappels Rendez-vous",
   "short_name": "Rappels",
-  "description": "Application de rappels avec notifications et audio",
-  "start_url": "./index.html",
+  "start_url": "/rappels-rendezvous/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0d6efd",
