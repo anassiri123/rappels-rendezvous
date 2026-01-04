@@ -1,20 +1,25 @@
-/* ===== BASE ===== */
+/* ===== RESET & BASE ===== */
 * {
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 body {
-  margin: 0;
+  background: #f4f6f9;
+  color: #1f2937;
   padding: 16px;
-  background: #f1f3f6;
-  color: #222;
+  max-width: 480px;
+  margin: auto;
 }
 
 /* ===== TITRE ===== */
 h2 {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 
 /* ===== FORMULAIRE ===== */
@@ -22,114 +27,126 @@ form {
   background: #ffffff;
   padding: 16px;
   border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   margin-bottom: 20px;
 }
 
-/* Inputs TOUJOURS en colonne */
-form input,
-form textarea,
-form button {
-  width: 100%;
-  display: block;
-}
-
-/* Inputs */
 input,
 textarea {
-  padding: 14px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+  width: 100%;
+  padding: 12px;
   margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
 }
 
 textarea {
-  min-height: 90px;
-  resize: vertical;
+  resize: none;
+  min-height: 70px;
 }
 
 /* ===== BOUTONS ===== */
 button {
-  padding: 14px;
-  font-size: 16px;
+  width: 100%;
+  padding: 12px;
   border-radius: 12px;
   border: none;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  margin-bottom: 12px;
+  transition: transform 0.05s ease, box-shadow 0.1s ease;
 }
 
-/* Bouton audio */
+button:active {
+  transform: scale(0.98);
+}
+
+/* Bouton enregistrement audio */
 #recordBtn {
-  background: #0d6efd;
-  color: #fff;
+  background: #f3f4f6;
+  color: #111827;
+  margin-bottom: 8px;
+  border: 1px solid #d1d5db;
 }
 
 /* Bouton ajouter */
 form button[type="submit"] {
-  background: #198754;
-  color: #fff;
+  background: #0d6efd;
+  color: white;
+  margin-top: 6px;
+  box-shadow: 0 6px 16px rgba(13, 110, 253, 0.4);
 }
 
-/* Activer notifications */
-#enableNotif {
-  background: #ff9800;
-  color: #fff;
-}
-
-/* ===== TEXTE STATUS AUDIO ===== */
+/* Statut audio */
 #recordStatus {
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: #059669;
+  margin-bottom: 10px;
 }
 
-/* ===== LISTE ===== */
+/* ===== LISTE DES RDV ===== */
 ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
 }
 
 /* Carte rendez-vous */
 li {
-  background: #ffffff;
+  background: white;
   padding: 14px;
-  margin-bottom: 14px;
   border-radius: 14px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  margin-bottom: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
-/* Date */
+/* Date / heure */
 li strong {
   display: block;
+  font-size: 0.95rem;
+  color: #2563eb;
   margin-bottom: 6px;
 }
 
-/* Boutons dans la carte */
+/* Texte */
+li br + text {
+  margin-bottom: 8px;
+}
+
+/* Boutons dans chaque RDV */
 li button {
   width: 100%;
   margin-top: 8px;
-  border-radius: 10px;
-  font-size: 15px;
 }
 
-/* Écouter */
+/* Bouton écouter */
 li button:first-of-type {
-  background: #0d6efd;
+  background: #10b981;
   color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
-/* Supprimer */
+/* Bouton supprimer */
 li button:last-of-type {
-  background: #dc3545;
+  background: #ef4444;
   color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
-/* ===== LARGE ÉCRAN ===== */
-@media (min-width: 600px) {
-  body {
-    max-width: 420px;
-    margin: auto;
-  }
+/* ===== NOTIFICATIONS ===== */
+#enableNotif {
+  background: #fbbf24;
+  color: #78350f;
+  margin-top: 20px;
+  box-shadow: 0 6px 16px rgba(251, 191, 36, 0.5);
+}
+
+/* ===== PETIT PLUS : ANIMATION ===== */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(13,110,253,0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(13,110,253,0); }
+  100% { box-shadow: 0 0 0 0 rgba(13,110,253,0); }
+}
+
+form button[type="submit"] {
+  animation: pulse 2s infinite;
 }
