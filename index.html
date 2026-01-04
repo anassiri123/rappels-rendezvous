@@ -1,38 +1,50 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Rappels Rendez-vous</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d6efd">
-<link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0d6efd">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
-<h2>📅 Mes rendez-vous</h2>
+  <h2>📅 Mes rendez-vous</h2>
 
-<form id="appointmentForm">
-  <input type="date" id="date" required>
-  <input type="time" id="time" required>
+  <form id="appointmentForm">
+    <input type="date" id="date" required>
+    <input type="time" id="time" required>
+    <textarea id="text" placeholder="Texte du rappel" required></textarea>
 
-  <textarea id="text" placeholder="Texte du rappel" required></textarea>
+    <button type="button" id="recordBtn">🎙️ Enregistrer l’audio</button>
+    <p id="recordStatus"></p>
 
-  <button type="button" id="recordBtn">🎙️ Enregistrer l’audio</button>
-  <p id="recordStatus"></p>
+    <button type="submit">➕ Ajouter</button>
+  </form>
 
-  <button type="submit">➕ Ajouter</button>
-</form>
+  <ul id="list"></ul>
 
-<ul id="list"></ul>
+  <button id="enableNotif">🔔 Activer les notifications</button>
 
-<button id="enableNotif">🔔 Activer les notifications</button>
+  <!-- Modal rappel -->
+  <div id="alarmModal" class="modal hidden">
+    <div class="modalCard">
+      <h3>⏰ Rappel</h3>
+      <p id="alarmText"></p>
+      <div class="modalBtns">
+        <button id="listenBtn" class="primary">▶️ Écouter</button>
+        <button id="closeModalBtn">Fermer</button>
+      </div>
+    </div>
+  </div>
 
-<script src="app.js"></script>
+  <script src="./app.js"></script>
   <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-  }
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./service-worker.js");
+    }
   </script>
 </body>
 </html>
