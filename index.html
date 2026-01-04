@@ -39,7 +39,25 @@
       </div>
     </div>
   </div>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBWCblzEU4XjE_HLF5pXHYvM-8RjVEJJQQ",
+    authDomain: "rappels-rendezvous.firebaseapp.com",
+    projectId: "rappels-rendezvous",
+    storageBucket: "rappels-rendezvous.firebasestorage.app",
+    messagingSenderId: "1022749873102",
+    appId: "1:1022749873102:web:e0d47471a9bb49a5f2519f"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
   <script src="./app.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
