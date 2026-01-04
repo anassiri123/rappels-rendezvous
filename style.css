@@ -1,37 +1,127 @@
-body {
-  font-family: Arial, sans-serif;
-  padding: 15px;
-  background: #f5f5f5;
+/* ===== RESET SIMPLE ===== */
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+body {
+  margin: 0;
+  padding: 20px;
+  background: #f2f4f7;
+  color: #222;
+}
+
+/* ===== TITRE ===== */
 h2 {
   text-align: center;
-}
-
-form {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
   margin-bottom: 20px;
 }
 
-input, textarea, button {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
+/* ===== FORMULAIRE ===== */
+form {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
 }
 
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ===== BOUTONS ===== */
 button {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+/* Bouton enregistrer audio */
+#recordBtn {
   background: #007bff;
   color: white;
-  border: none;
-  border-radius: 5px;
+}
+
+/* Bouton ajouter */
+form button[type="submit"] {
+  background: #28a745;
+  color: white;
+}
+
+/* Notifications */
+#enableNotif {
+  background: #ff9800;
+  color: white;
+}
+
+/* ===== LISTE RDV ===== */
+ul {
+  list-style: none;
+  padding: 0;
 }
 
 li {
-  background: white;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 5px;
+  background: #ffffff;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
+/* Texte RDV */
+li b {
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ===== BOUTONS DANS RDV ===== */
+li button {
+  width: auto;
+  padding: 10px 14px;
+  font-size: 14px;
+  margin-right: 8px;
+  margin-top: 8px;
+}
+
+/* Bouton écouter */
+li button:nth-child(1) {
+  background: #007bff;
+  color: white;
+}
+
+/* Bouton supprimer */
+li button:nth-child(2) {
+  background: #dc3545;
+  color: white;
+}
+
+/* ===== STATUS AUDIO ===== */
+#recordStatus {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 600px) {
+  body {
+    max-width: 500px;
+    margin: auto;
+  }
+}
