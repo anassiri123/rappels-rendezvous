@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Rappels Rendez-vous</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d6efd">
 </head>
 <body>
 
@@ -26,5 +28,10 @@
 <button id="enableNotif">🔔 Activer les notifications</button>
 
 <script src="app.js"></script>
+  <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+  }
+  </script>
 </body>
 </html>
