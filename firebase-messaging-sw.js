@@ -2,7 +2,7 @@ importScripts("https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"
 importScripts("https://www.gstatic.com/firebasejs/12.7.0/firebase-messaging-compat.js");
 
 firebase.initializeApp({
-  apiKey: "TA_API_KEY",
+  apiKey: "AIzaSyBWCblzEU4XjE_HLF5pXHYvM-8RjVEJJQQ",
   authDomain: "rappels-rendezvous.firebaseapp.com",
   projectId: "rappels-rendezvous",
   storageBucket: "rappels-rendezvous.appspot.com",
