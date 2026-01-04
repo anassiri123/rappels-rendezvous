@@ -1,64 +1,110 @@
+// ===== DOM =====
 const form = document.getElementById("appointmentForm");
 const list = document.getElementById("list");
 const enableNotif = document.getElementById("enableNotif");
+const recordBtn = document.getElementById("recordBtn");
+const recordStatus = document.getElementById("recordStatus");
 
+const alarmModal = document.getElementById("alarmModal");
+const alarmText = document.getElementById("alarmText");
+const listenBtn = document.getElementById("listenBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+
+// ===== DATA =====
 let appointments = JSON.parse(localStorage.getItem("appointments")) || [];
 let triggered = JSON.parse(localStorage.getItem("triggered")) || {};
 
 let mediaRecorder = null;
 let audioChunks = [];
-let pendingAudio = null;
+let pendingAudioBlob = null;
+
+// ===== IndexedDB (audio storage) =====
+const DB_NAME = "rappels-db";
+const DB_STORE = "audios";
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbSet(key, value) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, "readwrite");
+    tx.objectStore(DB_STORE).put(value, key);
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function idbGet(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, "readonly");
+    const req = tx.objectStore(DB_STORE).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbDel(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, "readwrite");
+    tx.objectStore(DB_STORE).delete(key);
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+  });
+}
 
 // ===== NOTIFICATIONS =====
 enableNotif.onclick = async () => {
+  if (!("Notification" in window)) {
+    alert("Notifications non supportées sur ce navigateur.");
+    return;
+  }
   const perm = await Notification.requestPermission();
-  alert(perm === "granted"
-    ? "Notifications activées ✅"
-    : "Notifications refusées ❌");
+  alert(perm === "granted" ? "Notifications activées ✅" : "Notifications refusées ❌");
 };
 
 // ===== AUDIO RECORD =====
-document.getElementById("recordBtn").onclick = async () => {
+recordBtn.onclick = async () => {
   try {
     if (!mediaRecorder || mediaRecorder.state === "inactive") {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
       mediaRecorder = new MediaRecorder(stream);
       audioChunks = [];
 
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.ondataavailable = e => {
+        if (e.data && e.data.size > 0) audioChunks.push(e.data);
+      };
+
       mediaRecorder.onstop = () => {
         const blob = new Blob(audioChunks, { type: "audio/webm" });
-        pendingAudio = URL.createObjectURL(blob);
-        document.getElementById("recordStatus").textContent = "✅ Audio prêt";
+        pendingAudioBlob = blob;
+        recordStatus.textContent = "✅ Audio prêt (il sera attaché au prochain rendez-vous)";
         stream.getTracks().forEach(t => t.stop());
+        recordBtn.textContent = "🎙️ Enregistrer l’audio";
       };
 
       mediaRecorder.start();
-      document.getElementById("recordStatus").textContent = "🎙️ Enregistrement...";
+      recordStatus.textContent = "🎙️ Enregistrement...";
+      recordBtn.textContent = "⏹️ Arrêter l’audio";
     } else {
       mediaRecorder.stop();
     }
-  } catch {
-    alert("Erreur micro ❌ Autorise le micro");
+  } catch (e) {
+    console.error(e);
+    alert("Erreur micro ❌ Autorise le micro (Chrome conseillé).");
   }
-};
-
-// ===== ADD RDV =====
-form.onsubmit = e => {
-  e.preventDefault();
-
-  appointments.push({
-    id: Date.now(),
-    date: date.value,
-    time: time.value,
-    text: text.value,
-    audio: pendingAudio
-  });
-
-  pendingAudio = null;
-  save();
-  render();
-  form.reset();
 };
 
 // ===== SAVE =====
@@ -74,54 +120,143 @@ function render() {
     const li = document.createElement("li");
     li.innerHTML = `
       <b>${a.date} ${a.time}</b><br>
-      ${a.text}<br>
-      ${a.audio ? `<button onclick="playAudio(${a.id})">▶️ Écouter</button>` : ""}
-      <button onclick="removeAppointment(${a.id})">🗑️ Supprimer</button>
+      ${escapeHtml(a.text)}<br><br>
+      ${a.audioKey ? `<button type="button" onclick="playAudio(${a.id})">▶️ Écouter</button>` : `<em>Pas d’audio</em>`}
+      <button type="button" onclick="removeAppointment(${a.id})">🗑️ Supprimer</button>
       <hr>
     `;
     list.appendChild(li);
   });
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 // ===== PLAY AUDIO (USER CLICK) =====
-window.playAudio = id => {
+window.playAudio = async (id) => {
   const a = appointments.find(x => x.id === id);
-  if (a?.audio) new Audio(a.audio).play();
+  if (!a?.audioKey) return;
+
+  const blob = await idbGet(a.audioKey);
+  if (!blob) {
+    alert("Audio introuvable (peut-être supprimé).");
+    return;
+  }
+
+  const url = URL.createObjectURL(blob);
+  try {
+    const audio = new Audio(url);
+    await audio.play();
+  } catch (e) {
+    console.error(e);
+    alert("Impossible de lire l’audio sur ce téléphone.");
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(url), 20000);
+  }
 };
 
 // ===== DELETE =====
-window.removeAppointment = id => {
-  appointments = appointments.filter(a => a.id !== id);
+window.removeAppointment = async (id) => {
+  const a = appointments.find(x => x.id === id);
+  if (a?.audioKey) await idbDel(a.audioKey);
+
+  appointments = appointments.filter(x => x.id !== id);
   delete triggered[id];
   save();
   render();
 };
 
-// ===== CHECK ALARM =====
-setInterval(() => {
+// ===== ADD RDV =====
+form.onsubmit = async (e) => {
+  e.preventDefault();
+
+  const id = Date.now();
+  let audioKey = null;
+
+  // Si audio enregistré => stocker en IndexedDB
+  if (pendingAudioBlob) {
+    audioKey = "audio-" + id;
+    await idbSet(audioKey, pendingAudioBlob);
+  }
+
+  appointments.push({
+    id,
+    date: date.value,
+    time: time.value,
+    text: text.value,
+    audioKey
+  });
+
+  pendingAudioBlob = null;
+  recordStatus.textContent = "";
+  save();
+  render();
+  form.reset();
+};
+
+// ===== MODAL Rappel =====
+function showAlarmModal(appointment) {
+  alarmText.textContent = appointment.text;
+
+  listenBtn.onclick = async () => {
+    // audio uniquement après clic utilisateur
+    if (appointment.audioKey) await window.playAudio(appointment.id);
+    else alert("Pas d'audio pour ce rappel.");
+  };
+
+  alarmModal.classList.remove("hidden");
+}
+
+closeModalBtn.onclick = () => alarmModal.classList.add("hidden");
+alarmModal.addEventListener("click", (e) => {
+  if (e.target === alarmModal) alarmModal.classList.add("hidden");
+});
+
+// ===== Réception du message du SW après clic notification =====
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data?.type === "OPEN_ALARM") {
+      const alarmId = event.data.alarmId;
+      const a = appointments.find(x => x.id === alarmId);
+      if (a) showAlarmModal(a);
+    }
+  });
+}
+
+// ===== CHECK ALARM (app ouverte / active) =====
+// IMPORTANT : sans serveur push, ça ne peut déclencher QUE si l'app tourne.
+setInterval(async () => {
   const now = new Date();
 
-  appointments.forEach(a => {
+  for (const a of appointments) {
     const target = new Date(`${a.date}T${a.time}`);
     if (now >= target && !triggered[a.id]) {
       triggered[a.id] = true;
       save();
 
-      // 🔔 Notification système (ding automatique)
-      if (Notification.permission === "granted") {
-        const n = new Notification("⏰ Rappel", {
-          body: a.text
+      // ✅ Notification via Service Worker (plus fiable)
+      if ("serviceWorker" in navigator && Notification.permission === "granted") {
+        const reg = await navigator.serviceWorker.ready;
+        reg.showNotification("⏰ Rappel", {
+          body: a.text,
+          tag: "alarm-" + a.id,
+          renotify: true,
+          data: { alarmId: a.id }
         });
-
-        // 👉 clic utilisateur = autorise l'audio
-        n.onclick = () => {
-          window.focus();
-        };
+      } else {
+        alert("⏰ Rappel : " + a.text);
       }
 
-      alert("⏰ Rappel : " + a.text);
+      // Affiche aussi dans l'app si elle est ouverte
+      showAlarmModal(a);
     }
-  });
+  }
 }, 1000);
 
 render();
