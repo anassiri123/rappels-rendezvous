@@ -63,8 +63,14 @@
 <script>
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./firebase-messaging-sw.js")
-      .then(() => console.log("✅ firebase-messaging-sw.js enregistré"))
-      .catch(err => console.error("❌ SW erreur", err));
+      .then(() => {
+        document.getElementById("sw-status").textContent =
+          "✅ Service Worker enregistré";
+      })
+      .catch(() => {
+        document.getElementById("sw-status").textContent =
+          "❌ Erreur Service Worker";
+      });
   }
 </script>
 </body>
