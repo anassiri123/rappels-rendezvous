@@ -1,6 +1,5 @@
 // ===== DOM =====
-const VAPID_KEY = "BAfZbxjnwa35di5_iFswUYEr4dHUgz1hrIz6rOTnEGL3WcJUro9iMHP3s28jbLC56Qa6w41pvKdqp3yu-89KeSc
-";
+const VAPID_KEY = "BAfZbxjnwa35di5_iFswUYEr4dHUgz1hrIz6rOTnEGL3WcJUro9iMHP3s28jbLC56Qa6w41pvKdqp3yu-89KeSc";
 const form = document.getElementById("appointmentForm");
 const list = document.getElementById("list");
 const enableNotif = document.getElementById("enableNotif");
