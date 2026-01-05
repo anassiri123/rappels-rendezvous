@@ -23,3 +23,25 @@ messaging.onBackgroundMessage(function(payload) {
 
   self.registration.showNotification(title, options);
 });
+self.addEventListener("notificationclick", function (event) {
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true })
+      .then(function (clientList) {
+
+        // Si l'app est déjà ouverte → on la focus
+        for (let i = 0; i < clientList.length; i++) {
+          let client = clientList[i];
+          if (client.url.includes("anassiri123.github.io") && "focus" in client) {
+            return client.focus();
+          }
+        }
+
+        // Sinon → on ouvre l'app
+        if (clients.openWindow) {
+          return clients.openWindow("https://anassiri123.github.io/rappels-rendezvous/");
+        }
+      })
+  );
+});
